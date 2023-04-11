@@ -1,3 +1,4 @@
 Django     == 4.2
 prospector == 1.9.0
 mypy       == 1.2.0
+bandit     == 1.7.5
