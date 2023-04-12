@@ -1,0 +1,25 @@
+Catalog of ideas to be scrubbed and planned.
+* <2023-04-12 Wed 11:15>
+** Problem being solved
+   Create a platform that
+   - provides a stable, observable test environment
+   - helps collaborate between devops, product and quality assurance
+   - is community driven: publish and consume envs, resources, fixtures and test data
+** User provided, langauge agnostic fixture creation and execution
+** Resource vs fixture, A resource
+   1. has its own state and scope.
+   2. may be held by one or more environments.
+   3. can be a terraform or custom implementation.
+   4. can be monitored, instrumented and inspected.
+   5. can be shared, locked or leased by one or more actors.
+   6. A fixture may return a resource spec
+      A resource spec has
+      - a unique resource id
+      - required configurations
+      - optional configurations
+   7. can be configured and reconfigured.
+   8. can be mutated if it is a target
+   9. cannot be mutated if it is part of an env.
+   10. env is composed of one or many resources.
+** Debezium to consume db logs
+   - avoid database polling and create an event driven system

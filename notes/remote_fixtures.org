@@ -1,0 +1,18 @@
+#+TITLE: Remote Fixtures - first cut
+
+* <2023-04-11 Tue 23:03> Remote fixtures
+  Listing down sub-problems. Then we should sort in the order to pick up.
+** Creating fixture - use server git repo to have some pre-defined fixtures
+** Apis to consume fixtures
+** Fixture runner
+** Client side libraries to integrate with fixture service - pytest
+** user interface
+*** test runner monitoring
+* Models
+  1. fixture_defs
+  2. fixture_instances
+  3. test_sessions
+* Architecture
+  Component list:
+  1. django wsgi server hosted on apache or npm
+  2. postgres database
