@@ -4,14 +4,12 @@ doc-warnings: true
 max-line-length: 120
 
 ignore-patterns:
-    - colosseum/local_settings.py
-    - deployment/local_settings.py.j2
     - manage.py
     - hooks/pre-commit
 
 ignore-paths:
-    - colosseum/migrations/
-    - ve/
+    - /migrations/
+    - cleanslate_services/
 
 uses:
     - django
