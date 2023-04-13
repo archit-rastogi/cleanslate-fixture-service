@@ -9,12 +9,12 @@ FIXTURE_STATUS = [
 ]
 
 
-class Fixture(models.Model):
+class FixtureDefs(models.Model):
 
     """Fixture model to capture a remote fixture."""
 
     class Meta:
-        db_table = "cleanslate_fixture"
+        db_table = "cleanslate_fixture_defs"
         abstract = False
 
     namespace = models.CharField(max_length=100)

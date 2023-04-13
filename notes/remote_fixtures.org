@@ -4,6 +4,9 @@
   Listing down sub-problems. Then we should sort in the order to pick up.
 ** Creating fixture - use server git repo to have some pre-defined fixtures
 ** Apis to consume fixtures
+   - list
+   - crud
+   - execute
 ** Fixture runner
 ** Client side libraries to integrate with fixture service - pytest
 ** user interface

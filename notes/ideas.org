@@ -6,6 +6,9 @@ Catalog of ideas to be scrubbed and planned.
    - helps collaborate between devops, product and quality assurance
    - is community driven: publish and consume envs, resources, fixtures and test data
 ** User provided, langauge agnostic fixture creation and execution
+   - a dsl to create fixtures,
+     - may be reuse dsl from terraform
+     - or get inspired and define own dsl
 ** Resource vs fixture, A resource
    1. has its own state and scope.
    2. may be held by one or more environments.
@@ -23,3 +26,7 @@ Catalog of ideas to be scrubbed and planned.
    10. env is composed of one or many resources.
 ** Debezium to consume db logs
    - avoid database polling and create an event driven system
+* Associate a fixture + testdataset to a human readable text
+  - use the text to define pre-requisites
+* dictless --> pydantic library does similar job.
+* use django for poc only. must use golang which is implicitly async.
