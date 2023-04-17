@@ -30,3 +30,8 @@ Catalog of ideas to be scrubbed and planned.
   - use the text to define pre-requisites
 * dictless --> pydantic library does similar job.
 * use django for poc only. must use golang which is implicitly async.
+* Accept git repository containing fixture def and implementation
+  - use requirements.txt to install dependencies
+  - one docker image for one namespace.
+  - one virtualenv for every git repos or git sub-module or directory, as configured in spec.yml
+  - scan a spec.yml to list directories and idenitfy one or more fixtures

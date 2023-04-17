@@ -1,1 +1,4 @@
 * TODO setup logging
+* TODO explore and refactor with pydantic
+* TODO use free cdn js delivery platform
+  - https://www.jsdelivr.com/

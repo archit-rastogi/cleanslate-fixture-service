@@ -19,3 +19,10 @@
   Component list:
   1. django wsgi server hosted on apache or npm
   2. postgres database
+  3. redis with celery
+* <2023-04-17 Mon 10:58> frontend frameworks
+  - will use bootstrap because
+    - low learning curve
+    - faster development
+    - focus more on backend
+** explore and build with vite - vue once product is ni shape.
