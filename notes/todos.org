@@ -1,4 +1,7 @@
 * DONE setup logging
 * TODO use free cdn js delivery platform
   - https://www.jsdelivr.com/
-* TODO explore and refactor with pydantic
+* DONE explore and refactor with pydantic
+* TODO explore django rest frameworks
+* TODO layer views and lib interacting with models
+* TODO error handling when creating test sessions

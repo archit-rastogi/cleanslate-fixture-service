@@ -25,4 +25,4 @@
     - low learning curve
     - faster development
     - focus more on backend
-** explore and build with vite - vue once product is ni shape.
+** explore and build with vite - vue once product is in shape.
