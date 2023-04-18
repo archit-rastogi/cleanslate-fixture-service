@@ -9,7 +9,6 @@ ignore-patterns:
 
 ignore-paths:
     - /migrations/
-    - cleanslate_services/
 
 uses:
     - django

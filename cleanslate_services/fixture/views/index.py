@@ -1,11 +1,12 @@
 """All views are defined here. Implementation must go to lib."""
-from typing import Dict, List
+from typing import Any, Dict
 
-import fixture.lib.api as api_lib
 from django.contrib.auth.decorators import login_required
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest
 from django.shortcuts import render
 from django.views.decorators.csrf import requires_csrf_token
+
+import fixture.lib.api as api_lib
 
 
 @login_required

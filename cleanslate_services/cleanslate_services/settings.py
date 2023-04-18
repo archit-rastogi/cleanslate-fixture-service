@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import logging
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-(ty%(ys_*fnort22^gnio1#cz(dtz+awal7!%k9rrl##tpsnu^"
+SECRET_KEY = "django-insecure-(ty%(ys_*fnort22^gnio1#cz(dtz+awal7!%k9rrl##tpsnu^" # noqa
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -148,32 +147,32 @@ LOGGING = {
         "proj_log_file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": "../logs/main.log",
+            "filename": BASE_DIR / "logs/main.log",
             "formatter": "verbose"
         },
         "proj_log_file_debug": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": "../logs/main-debug.log",
+            "filename": BASE_DIR / "logs/main-debug.log",
             "formatter": "verbose"
         },
         "fixture_log_file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": "../logs/fixture/main.log",
+            "filename": BASE_DIR / "logs/fixture/main.log",
             "formatter": "verbose"
         },
         "fixture_log_file_debug": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": "../logs/fixture/main-debug.log",
+            "filename": BASE_DIR / "logs/fixture/main-debug.log",
             "formatter": "verbose",
             "filters": ["require_debug_true"]
         }
     },
     "root": {
-            "handlers": ["proj_log_file", "proj_log_file_debug"],
-            "level": "DEBUG"
+        "handlers": ["proj_log_file", "proj_log_file_debug"],
+        "level": "DEBUG"
     },
     "loggers": {
         "fixture": {
