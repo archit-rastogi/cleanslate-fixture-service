@@ -33,6 +33,15 @@ class FixtureInstanceStatus(models.IntegerChoices):
     TEARDOWN_FAILED = 7
 
 
+class FixtureType(models.IntegerChoices):
+
+    """Types of fixtures."""
+
+    FIXTURE_INTERNAL = 1
+    FIXTURE_GITHUB = 2
+    FIXTURE_DOCKER = 3
+
+
 class FixtureDefs(models.Model):
 
     """Fixture model to capture a remote fixture."""
@@ -40,6 +49,7 @@ class FixtureDefs(models.Model):
     class Meta:
         db_table = "cleanslate_fixture_defs"
         abstract = False
+        unique_together = ["namespace", "name"]
 
     namespace = models.CharField(max_length=100)
     name = models.CharField(max_length=30)
@@ -47,6 +57,7 @@ class FixtureDefs(models.Model):
     status = models.CharField(max_length=1, choices=FIXTURE_STATUS)
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
+    fixture_type = models.IntegerField(choices=FixtureType.choices, default=None, null=True)
 
 
 class TestSession(models.Model):
@@ -75,7 +86,7 @@ class FixtureInstance(models.Model):
         db_table = "cleanslate_fixture_instances"
         abstract = False
 
-    fixture_def_id = models.ForeignKey(FixtureDefs, on_delete=models.PROTECT)
+    fixture_def_id = models.ForeignKey(FixtureDefs, null=True, on_delete=models.PROTECT)
     session_id = models.ForeignKey(TestSession, on_delete=models.PROTECT)
     status = models.IntegerField(choices=FixtureInstanceStatus.choices)
     message = models.TextField()

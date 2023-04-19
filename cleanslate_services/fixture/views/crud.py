@@ -5,15 +5,14 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET, require_POST
 
 import fixture.lib.api as api_lib
-from fixture.models import TestSession, TestSessionStatus
-from fixture.views.models import TestSessionRequest
+from fixture.models import TestSession, TestSessionStatus, FixtureInstance, FixtureInstanceStatus
+from fixture.views.models import TestSessionRequest, AcquireFixtureInstanceRequest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -63,12 +62,34 @@ def list_test_sessions(request: HttpRequest):
     }
     return JsonResponse(data=session_dict)
 
-def create_fixture_instance(request: HttpRequest):
-    """Create a new fixture instance."""
 
-
+@login_required
+@requires_csrf_token
+@require_POST
 def acquire_fixture_instance(request: HttpRequest):
     """Acquires a lock on fixture instance."""
+    # verify and create request for acquiring a fixture
+    req_json = json.loads(request.body)
+    acquire_request = AcquireFixtureInstanceRequest(**req_json)
+
+    # internal fixture
+    fix_class = api_lib.get_fixture_class(acquire_request.namespace, acquire_request.name)
+    # upsert the internal fixture def
+
+    instance = FixtureInstance(
+        status=FixtureInstanceStatus.CREATED,
+        created_at=datetime.now(),
+        updated_at=None,
+        message=None,
+        fixture_def_id=None,
+        session_id=acquire_request.session_id
+    )
+    instance.save()
+
+    # fixture_def_id = FixtureDefs.objects.filter(
+    #     namespace=acquire_request.namespace,
+    #     name=acquire_request.name).first().id
+
 
 
 def yield_fixture_instance(request: HttpRequest):
