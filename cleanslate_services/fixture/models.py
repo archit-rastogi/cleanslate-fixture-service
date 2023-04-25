@@ -56,7 +56,7 @@ class FixtureDefs(models.Model):
     description = models.CharField(max_length=200)
     status = models.CharField(max_length=1, choices=FIXTURE_STATUS)
     created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
     fixture_type = models.IntegerField(choices=FixtureType.choices, default=None, null=True)
 
 
@@ -89,6 +89,6 @@ class FixtureInstance(models.Model):
     fixture_def_id = models.ForeignKey(FixtureDefs, null=True, on_delete=models.PROTECT)
     session_id = models.ForeignKey(TestSession, on_delete=models.PROTECT)
     status = models.IntegerField(choices=FixtureInstanceStatus.choices)
-    message = models.TextField()
+    message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)

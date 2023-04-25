@@ -1,0 +1,22 @@
+<div class="card-group">
+  {% for card in cards %}
+  <div class="cards border mx-3 my-3" style="width: 300px; height: 350px" id={{ card.name }}>
+    <div class="card-body text-center">
+      <h2 class="card-title">{{ card.title }}</h2>
+      <p class="card-text" style="height: 200px">{{ card.summary }}</p>
+      <a class="btn btn-primary" id={{ card.name }} href="#">{{ card.action }} </a>
+    </div>
+  </div>
+  {% endfor %}
+
+  <script type="text/javascript">
+    $(".btn-primary").click(function() {
+        $(".card-group").hide()
+        // get id of card
+        var card_id = $(this).id
+
+        // load content for the card id
+        load_card_details(card_id)
+    })
+  </script>
+</div>

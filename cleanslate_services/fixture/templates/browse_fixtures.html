@@ -1,0 +1,18 @@
+<div>
+  <table class="table table-bordered table-striped top-fixed">
+    <thead class="thead-light">
+      <tr>
+        <th>Sno</th>
+        <th>Namespace</th>
+        <th>Fixture Name</th>
+      </tr>
+    </thead>
+    {% for fixture in fixture_list %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ fixture.namespace }}</td>
+      <td>{{ fixture.name }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>

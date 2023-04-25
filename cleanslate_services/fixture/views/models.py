@@ -9,11 +9,10 @@ class TestSessionRequest(BaseModel):
     description: str
 
 
-class AcquireFixtureInstanceRequest(BaseModel):
+class CreateFixtureInstanceRequest(BaseModel):
 
     """Request for creating a new fixture instance."""
 
     namespace: str
     name: str
     session_id: int
-

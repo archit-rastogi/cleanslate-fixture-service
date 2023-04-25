@@ -23,5 +23,7 @@ import fixture.views.index as index_view
 urlpatterns = [
     path("", index_view.render_index),
     path("admin/", admin.site.urls),
+    path("get_cards", index_view.get_cards),
+    path("get_card_details/<str:card_id>", index_view.get_card_details),
     path("fixture/list", crud_view.fixture_list)
 ]
