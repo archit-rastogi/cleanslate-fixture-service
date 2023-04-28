@@ -26,3 +26,107 @@
     - faster development
     - focus more on backend
 ** explore and build with vite - vue once product is in shape.
+* <2023-04-26 Wed 23:29> Executing a fixture
+** Requirements
+   Below describes the basic high level requirements. Moving backwards.
+   1. Client - server interaction via a cleanslate test session.
+   2. Primary interfaces viz. a fixture, a resource 
+   3. User / community provided fixtures and resources.
+
+   lambda --> fully stateless
+   cleanslate --> stateful
+** Definitions
+*** Resource definition
+   - may or may not be a stateful entity.
+   - a test_config, file, urls, strings, credentials, null are examples of stateless-resources.
+     - scalar, serializable data
+     - these can neither be mutated nor destroyed.
+   - if stateful and testable then
+     - init-state must be defined
+     - zero state is when resource does not exists
+     - stateful resources are created with stateless resources at init state
+     - may or may not be mutable
+     - may or may not be idempotent
+     - may or may be destroyed.
+     - must defined transtions from any given state to init state, zero state
+   - Compose a resource from other resources. like a container.
+   - has associated access policies via rbac, lifecyle policies, settings, etc.
+   - has a lease associated with it.
+     - states: leased, expired
+   - provides one or more interfaces interact with the resouce.
+     - a proxy interface that can be created in runtime to interact with the resource over the network.
+**** Different types of resources
+     1. DocumentResource -> JsonResource
+     2. StreamingResource -> S3ObjectResource, GcsResource
+     3. IPyObject -> boto3, etc...
+**** Resource ownership and access has to be defined and implemented.
+*** Test session
+    A test session
+    - is a resource that helps to lease one or more other resources.
+    - pytest runner leases a test session via remote fixtures. Hence, a test session shadows a test process.
+    - lifecycle, lease policy, etc of the resources created by it are scoped to the test session.
+*** Fixture definition
+   - is a computaion that defines setup and teardown.
+   - has zero or more input params ---> a resource.
+   - output of a fixture is always a resource.
+*** remote fixtures <--> remote resource relationship
+   - A fixture can consume one or more resources
+     - by depending on one or more fixture 
+     - by explicitly depending on a remote resource.
+   - A fixture can return a resource.
+** A pytest Workflow
+   1. Executes the test.
+      1. test can depend on one or more fixtures.
+      2. local fixtures are executed on the same host as test.
+      3. remote fixtures are executed in remote.
+** Impl details
+*** Remote fixture
+    1. setup and teardown state of a fixture
+       - not yet executed, queued, waiting, success, aborted, failure, retry_pending, retry_queued, running
+    2. fixture instance must be associated with a test session.
+    3. setup stack frame should also be persisted so that teardown has the required state for execution.
+    4. Execute in a server thread.
+    5. Api spec:
+       POST <base_ur>/fixture/instance/<id>/setup
+       POST <base_ur>/fixture/instance/<id>/teardown
+*** Remote Resource - native
+    1. Anything that can be serialized within a 4 kb block.
+    2. ResourceSet - container of zero or more resources
+    3. CRUD Apis
+       - GET <base_url>/create_resource
+       - GET <base_url>/get_resource
+       - POST <base_url>/list_resources
+       - POST <base_url>/delete_resource
+       - PUT <base_url>/update_resource
+    4. Apis to interact with resource
+       - how to interact with resources ?
+         - depends on resource itself
+         - can extract contents
+         - can issue commands, etc.
+**** interface design
+     is_transient
+     has_compute
+     has_storage
+     has_io
+     can_mutate
+     can_destroy
+     can_create
+     can_provision
+*** pytest plugins
+*** Dsl for state transitions
+*** Remote proxy interface generation vs vend multiple python packages for different resources.
+    1. that can be initialized in runtime.
+       - initialize getters / setters
+       - methods
+       - property, state, etc.
+       - exceptions
+    2. can be generated for any python object
+    3. support both async and sync.
+* Plan
+** TODO Execute fixture in server process as a thread.
+** DONE Add and implement a resource - native resource.
+** TODO Supprot fixtures returning a resource.
+
+
+
+

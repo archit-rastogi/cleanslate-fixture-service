@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 # Create your models here.
@@ -40,6 +42,13 @@ class FixtureType(models.IntegerChoices):
     FIXTURE_INTERNAL = 1
     FIXTURE_GITHUB = 2
     FIXTURE_DOCKER = 3
+
+
+class ResourceType(models.IntegerChoices):
+
+    """Types of Resources."""
+
+    JSON_RESOURCE = 1
 
 
 class FixtureDefs(models.Model):
@@ -92,3 +101,28 @@ class FixtureInstance(models.Model):
     message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField(null=True)
+
+
+class ResourceContent(models.Model):
+
+    """Content of a resource."""
+
+    class Meta:
+        db_table = "cleanslate_resource_content"
+        abstract = False
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    data = models.BinaryField(null=True, editable=False, max_length=4096)
+
+
+class Resource(models.Model):
+
+    """A resource instance."""
+
+    class Meta:
+        db_table = "cleanslate_resource"
+        abstract = False
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    resource_type = models.IntegerField(choices=ResourceType.choices)
+    content = models.ForeignKey(ResourceContent, null=True, on_delete=models.CASCADE)
