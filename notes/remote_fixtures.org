@@ -94,10 +94,17 @@
     2. ResourceSet - container of zero or more resources
     3. CRUD Apis
        - GET <base_url>/create_resource
+         + two ways to implement this:
+           1. create content and resource in a transaction
+           2. create content and pass content id to resource during create
+           3. create resource, create content and then update resource with content
+         + Design choice: (1). Why ?
+           - Content internal repr is opaque to user.
+           - Content is managed by higher level objects.
+           - Content once created cannot be altered.
        - GET <base_url>/get_resource
        - POST <base_url>/list_resources
        - POST <base_url>/delete_resource
-       - PUT <base_url>/update_resource
     4. Apis to interact with resource
        - how to interact with resources ?
          - depends on resource itself
@@ -125,7 +132,7 @@
 * Plan
 ** TODO Execute fixture in server process as a thread.
 ** DONE Add and implement a resource - native resource.
-** TODO Supprot fixtures returning a resource.
+** TODO Support fixtures returning a resource.
 
 
 
