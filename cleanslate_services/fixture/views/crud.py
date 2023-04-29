@@ -5,14 +5,18 @@ from datetime import datetime, timezone
 from typing import List, Dict, Any
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction, DatabaseError
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET, require_POST
 
 import fixture.lib.api as api_lib
-from fixture.models import TestSession, TestSessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs
-from fixture.views.models import TestSessionRequest, CreateFixtureInstanceRequest
+from fixture.models import (
+    TestSession, TestSessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs, Resource, ResourceContent,
+    ResourceType
+)
+from fixture.views.models import TestSessionRequest, CreateFixtureInstanceRequest, CreateResourceRequest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -87,3 +91,46 @@ def create_fixture_instance(request: HttpRequest):
     instance.save()
     instance_info = model_to_dict(instance)
     return JsonResponse(data=instance_info)
+
+
+@login_required
+@require_POST
+def create_resource(request: HttpRequest):
+    """Create resource."""
+    req_json = json.loads(request.body)
+    create_res_req = CreateResourceRequest(**req_json)
+
+    error_msg = "Unknown Error"
+    try:
+        # get resource type. currently only json is available / implemented
+        res_type = ResourceType(create_res_req.resource_type)
+        # verify json content
+        json.loads(create_res_req.content)
+        with transaction.atomic():
+            # create resource content
+            rcontent = ResourceContent(data=bytearray(create_res_req.content, encoding="utf-8"))
+            rcontent.save()
+            # create resource
+            res = Resource(resource_type=res_type, content=rcontent)
+            res.save()
+            return JsonResponse(model_to_dict(res))
+    except (json.decoder.JSONDecodeError, DatabaseError, ValueError) as exc:
+        error_msg = exc.args[0]
+    return JsonResponse({"error": error_msg}, status=500)
+
+
+@login_required
+@require_GET
+def get_resource(request: HttpRequest):
+    """Get resource."""
+
+
+@login_required
+@require_GET
+def list_resources(request: HttpRequest):
+    """List_ esources."""
+
+
+@login_required
+def delete_resource(request: HttpRequest):
+    """Delete resource."""

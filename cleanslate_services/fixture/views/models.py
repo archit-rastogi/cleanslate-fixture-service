@@ -16,3 +16,11 @@ class CreateFixtureInstanceRequest(BaseModel):
     namespace: str
     name: str
     session_id: int
+
+
+class CreateResourceRequest(BaseModel):
+
+    """Request for creating a resource type."""
+
+    resource_type: int
+    content: str
