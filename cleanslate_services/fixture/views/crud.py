@@ -150,7 +150,7 @@ def get_resource(request: HttpRequest):
         })
     except (ValueError, AttributeError) as exc:
         return JsonResponse({"error": exc.args[0]}, status=404)
-    
+
 
 @login_required
 @require_http_methods(["DELETE"])
