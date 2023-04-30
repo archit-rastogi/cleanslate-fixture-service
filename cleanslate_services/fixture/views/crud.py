@@ -14,7 +14,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 
 import fixture.modules.api as api_lib
 from fixture.models import (
-    TestSession, TestSessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs, Resource, ResourceContent,
+    Session, TestSessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs, Resource, ResourceContent,
     ResourceType
 )
 from fixture.views.models import (
@@ -43,7 +43,7 @@ def create_test_session(request: HttpRequest):
     session_req = TestSessionRequest(**req_body)
 
     # create a new test session
-    new_session = TestSession(
+    new_session = Session(
         name=session_req.name,
         description=session_req.description,
         status=TestSessionStatus.CREATED,
@@ -62,7 +62,7 @@ def create_test_session(request: HttpRequest):
 @require_GET
 def list_test_sessions(request: HttpRequest):
     """List test sessions."""
-    all_sessions = TestSession.objects.all().filter(is_deleted=False)
+    all_sessions = Session.objects.all().filter(is_deleted=False)
     LOGGER.debug("Found %d active sessions.", len(all_sessions))
     session_dict = {
         "data": [model_to_dict(session) for session in all_sessions]
@@ -89,7 +89,7 @@ def create_fixture_instance(request: HttpRequest):
         updated_at=None,
         message=None,
         fixture_def_id=None,
-        session_id=TestSession.objects.filter(id=acquire_request.session_id).first()
+        session_id=Session.objects.filter(id=acquire_request.session_id).first()
     )
     instance.save()
     instance_info = model_to_dict(instance)

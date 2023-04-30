@@ -69,12 +69,12 @@ class FixtureDefs(models.Model):
     fixture_type = models.IntegerField(choices=FixtureType.choices, default=None, null=True)
 
 
-class TestSession(models.Model):
+class Session(models.Model):
 
-    """A test session where all tests run."""
+    """A session is where all fixtures run."""
 
     class Meta:
-        db_table = "cleanslate_test_session"
+        db_table = "cleanslate_session"
         abstract = False
 
     name = models.CharField(max_length=100, unique=True)
@@ -96,7 +96,7 @@ class FixtureInstance(models.Model):
         abstract = False
 
     fixture_def_id = models.ForeignKey(FixtureDefs, null=True, on_delete=models.PROTECT)
-    session_id = models.ForeignKey(TestSession, on_delete=models.PROTECT)
+    session_id = models.ForeignKey(Session, on_delete=models.PROTECT)
     status = models.IntegerField(choices=FixtureInstanceStatus.choices)
     message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField()

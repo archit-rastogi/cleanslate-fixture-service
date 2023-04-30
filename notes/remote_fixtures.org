@@ -60,11 +60,16 @@
      2. StreamingResource -> S3ObjectResource, GcsResource
      3. IPyObject -> boto3, etc...
 **** Resource ownership and access has to be defined and implemented.
-*** Test session
-    A test session
-    - is a resource that helps to lease one or more other resources.
-    - pytest runner leases a test session via remote fixtures. Hence, a test session shadows a test process.
-    - lifecycle, lease policy, etc of the resources created by it are scoped to the test session.
+*** Session is a Resource.
+    A session
+    - A session encapsulates the environment having a compute, a storage and a network.
+      - Session id is opaque to users and hides internal resources.
+      - A thread pool is the first impl. sharing resources of the service.
+      - Any fixture runs on resources provided by a session.
+      - User provided fixtures always run in scope of a session.
+    - pytest runner creates session
+    - lifecycle, lease policy, etc are created and scoped to the test session.
+      - These are applicable to the resources and takes precedence.
 *** Fixture definition
    - is a computaion that defines setup and teardown.
    - has zero or more input params ---> a resource.
