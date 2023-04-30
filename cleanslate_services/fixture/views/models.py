@@ -24,3 +24,24 @@ class CreateResourceRequest(BaseModel):
 
     resource_type: int
     content: str
+
+
+class ResourceQuery(BaseModel):
+
+    """Get Resource query params."""
+
+    identifier: str | None = None
+
+
+class GetResourceRequest(BaseModel):
+
+    """Request to get a resource."""
+
+    query: ResourceQuery
+
+
+class DeleteResourceRequest(BaseModel):
+
+    """Request to delete a resource."""
+
+    identifier: str

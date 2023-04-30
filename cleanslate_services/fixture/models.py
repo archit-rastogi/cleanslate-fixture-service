@@ -125,4 +125,4 @@ class Resource(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     resource_type = models.IntegerField(choices=ResourceType.choices)
-    content = models.ForeignKey(ResourceContent, null=True, on_delete=models.CASCADE)
+    content = models.ForeignKey(ResourceContent, null=True, on_delete=models.PROTECT)
