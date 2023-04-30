@@ -25,5 +25,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("get_cards", index_view.get_cards),
     path("get_card_details/<str:card_id>", index_view.get_card_details),
-    path("fixture/list", crud_view.fixture_list)
+    path("fixture/list", crud_view.fixture_list),
+    path("resource/create", crud_view.create_resource),
+    path("resource/<str:identifier>/get", crud_view.get_resource),
+    # path("resource/list", crud_view.list_resources),
+    path("resource/<str:identifier>/delete", crud_view.delete_resource)
 ]
