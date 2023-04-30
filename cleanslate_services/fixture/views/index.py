@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET
 
-import fixture.lib.api as api_lib
+import fixture.modules.api as api_lib
 from fixture.views.constants import CardIds
 
 

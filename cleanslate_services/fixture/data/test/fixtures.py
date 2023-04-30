@@ -1,7 +1,7 @@
 import logging
 import time
 
-from fixture.lib.core.base import FixtureResult, RemoteFixtureImplBase
+from fixture.modules.core.base import FixtureResult, RemoteFixtureImplBase
 
 LOGGER = logging.getLogger(__name__)
 
