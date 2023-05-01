@@ -15,7 +15,6 @@ class CreateFixtureInstanceRequest(BaseModel):
 
     namespace: str
     name: str
-    session_id: int
 
 
 class CreateResourceRequest(BaseModel):

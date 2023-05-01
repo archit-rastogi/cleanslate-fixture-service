@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from typing import List, Dict, Any
 
 from django.contrib.auth.decorators import login_required
-from django.db import transaction, DatabaseError, IntegrityError
+from django.db import transaction, DatabaseError, IntegrityError, Error
 from django.db.models.deletion import ProtectedError
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, JsonResponse
@@ -33,31 +33,6 @@ def fixture_list(request: HttpRequest) -> List[str]:
 
 @login_required
 @requires_csrf_token
-@require_POST
-def create_test_session(request: HttpRequest):
-    """Create a new test session."""
-    req_body: Dict[str, Any] = json.loads(request.body)
-
-    # validate the request body
-    session_req = TestSessionRequest(**req_body)
-
-    # create a new test session
-    new_session = Session(
-        name=session_req.name,
-        description=session_req.description,
-        status=TestSessionStatus.CREATED,
-        created_at=datetime.now(),
-        updated_at=None,
-        exit_code=None,
-        is_deleted=False,
-        message=None)
-    new_session.save()
-    LOGGER.debug("Created new test session: %s", new_session.id)
-    return JsonResponse(data=model_to_dict(new_session))
-
-
-@login_required
-@requires_csrf_token
 @require_GET
 def list_test_sessions(request: HttpRequest):
     """List test sessions."""
@@ -67,32 +42,6 @@ def list_test_sessions(request: HttpRequest):
         "data": [model_to_dict(session) for session in all_sessions]
     }
     return JsonResponse(data=session_dict)
-
-
-@login_required
-@requires_csrf_token
-@require_POST
-def create_fixture_instance(request: HttpRequest):
-    """Acquires a lock on fixture instance."""
-    # verify and create request for acquiring a fixture
-    req_json = json.loads(request.body)
-    acquire_request = CreateFixtureInstanceRequest(**req_json)
-
-    fdef = FixtureDefs.objects.filter(namespace=acquire_request.namespace, name=acquire_request.name).first()
-    if fdef is None:
-        return JsonResponse(data={"error": "Fixture not found!"}, status=404)
-
-    instance = FixtureInstance(
-        status=FixtureInstanceStatus.CREATED,
-        created_at=datetime.now(tz=timezone.utc),
-        updated_at=None,
-        message=None,
-        fixture_def_id=None,
-        session_id=Session.objects.filter(id=acquire_request.session_id).first()
-    )
-    instance.save()
-    instance_info = model_to_dict(instance)
-    return JsonResponse(data=instance_info)
 
 
 @login_required
@@ -180,3 +129,119 @@ def delete_resource(request: HttpRequest):
     except (ValueError, AttributeError) as exc:
         return JsonResponse({"error": exc.args[0]}, status=404)
     return JsonResponse(data=None)
+
+
+@login_required
+@requires_csrf_token
+@require_http_methods(["POST"])
+def session_start(request: HttpRequest):
+    """Start a new session."""
+    req_body: Dict[str, Any] = json.loads(request.body)
+
+    # validate the request body
+    session_req = TestSessionRequest(**req_body)
+
+    # create a new test session
+    new_session = Session(
+        name=session_req.name,
+        description=session_req.description,
+        status=SessionStatus.CREATED,
+        created_at=datetime.now(),
+        updated_at=None,
+        exit_code=None,
+        is_deleted=False,
+        message=None)
+    new_session.save()
+    LOGGER.debug("Created new test session: %s", new_session.id)
+    return JsonResponse(data=model_to_dict(new_session))
+
+
+@login_required
+@require_http_methods(["POST"])
+def session_end(request: HttpRequest, session_id: str):
+    """End session with given session id."""
+    try:
+        message = "success"
+        status_code = 200
+        # check if session id is valid and status is valid
+        session = Session.objects.get(id=session_id)
+        if session.status < 4:
+            # Mark Session status to FINISHING
+            session.status = SessionStatus.FINISHING
+            session.save()
+    except Error as exc:
+        message = exc.args[0]
+        status_code = 404
+    return JsonResponse(data=message, status=status_code)
+
+
+@login_required
+@require_http_methods(["POST"])
+def session_new_fixture_instance(request: HttpRequest, session_id: str):
+    """Create a new fixture instance for given session id."""
+    # verify and create request for acquiring a fixture
+    req_json = json.loads(request.body)
+    fixture_request = CreateFixtureInstanceRequest(**req_json)
+    fdef = FixtureDefs.objects.get(namespace=fixture_request.namespace, name=fixture_request.name)
+    if fdef is None:
+        return JsonResponse(data={"error": "Fixture not found!"}, status=404)
+
+    msg = "Unknonw"
+    status_code = 500
+    try:
+        with transaction.atomic():
+            # check session state
+            session_obj = Session.objects.filter(id=session_id).select_for_update(skip_locked=True).first()
+            if session_obj is None or session_obj.status >= SessionStatus.FINISHING:
+                return JsonResponse(data={"error": "Invalid session or session status"}, status=404)
+            instance = FixtureInstance.objects \
+                .filter(session_id=session_id) \
+                .select_for_update(skip_locked=True) \
+                .get(fixture_def_id=fdef.id)
+            # case I: fixture instance already exists.
+            if instance is not None:
+                return JsonResponse(data={"error": f"Instance already exists: {instance.id}"}, status=404)
+
+            # case II: fixture instance does not exists.
+            instance = FixtureInstance(
+                status=FixtureInstanceStatus.CREATED,
+                created_at=datetime.now(tz=timezone.utc),
+                updated_at=None,
+                message=None,
+                fixture_def_id=fdef.id,
+                session_id=session_id)
+            instance.save()
+            instance_info = model_to_dict(instance)
+            return JsonResponse(data=instance_info)
+    except ValueError as exc:
+        msg = exc.args[0]
+        status_code = 404
+    except Error as exc:
+        msg = exc.args[0]
+        status_code = 500
+    return JsonResponse(data={"error": msg}, status=status_code)
+
+
+@login_required
+@require_http_methods(["POST"])
+def session_delete_fixture_instance(request: HttpRequest, session_id: str):
+    """session_delete_fixture_instance for given session id."""
+
+
+@login_required
+@require_http_methods(["GET"])
+def session_list_fixture_instances(request: HttpRequest, session_id: str):
+    """List fixture instances for given session id."""
+
+
+@login_required
+@require_http_methods(["GET"])
+def session_get_fixture_instance(request: HttpRequest, session_id: str):
+    """session_get_fixture_instance for given session id."""
+
+
+@login_required
+@require_http_methods(["GET", "POST", "DELETE"])
+def session_get_resource_by_fixture_instance(request: HttpRequest, session_id: str):
+    """session_get_resource_by_fixture_instance for given session id."""
+
