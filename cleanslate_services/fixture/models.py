@@ -11,7 +11,7 @@ FIXTURE_STATUS = [
 ]
 
 
-class TestSessionStatus(models.IntegerChoices):
+class SessionStatus(models.IntegerChoices):
 
     """Status for a test session."""
 
@@ -79,7 +79,7 @@ class Session(models.Model):
 
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=200)
-    status = models.IntegerField(choices=TestSessionStatus.choices)
+    status = models.IntegerField(choices=SessionStatus.choices)
     exit_code = models.IntegerField(null=True)
     is_deleted = models.BooleanField(default=False)
     message = models.TextField(null=True, blank=True)

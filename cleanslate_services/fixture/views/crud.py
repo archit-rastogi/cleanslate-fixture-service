@@ -14,8 +14,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 
 import fixture.modules.api as api_lib
 from fixture.models import (
-    Session, TestSessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs, Resource, ResourceContent,
-    ResourceType
+    Session, SessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs, Resource, ResourceContent, ResourceType
 )
 from fixture.views.models import (
     TestSessionRequest, CreateFixtureInstanceRequest, CreateResourceRequest, GetResourceRequest, DeleteResourceRequest
