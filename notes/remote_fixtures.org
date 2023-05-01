@@ -94,6 +94,15 @@
     5. Api spec:
        POST <base_ur>/fixture/instance/<id>/setup
        POST <base_ur>/fixture/instance/<id>/teardown
+**** request creating a fixture instance
+     - how many instances of a fixture do we allow ?
+       - first implementation forces exactly one instance irrespective of its state.
+       - when session ends, all instances execute teardown
+**** Running teardown
+     1. tear down succeeds
+     2. teardown fails with fatal error
+     3. teardown fails inetrmittently
+        1. how many times do we retry, first implementation never retries.
 *** Remote Resource - native
     1. Anything that can be serialized within a 4 kb block.
     2. ResourceSet - container of zero or more resources
