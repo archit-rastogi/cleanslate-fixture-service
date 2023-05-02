@@ -1,5 +1,15 @@
 #+TITLE: Remote Fixtures - first cut
 
+* Focus on below problems:
+** Runtime environment for executing fixtures
+   - should be able to run setup and teardown
+   - should support fixtures provided by the server
+   - should support user provided fixtures
+** Fixture Dependency Graph Resolution and execution
+   - compute dependency closure for the fixture instances
+   - execute the dependency graph
+** Remote Access to Resources
+   - access and manipulate resources remotely
 * <2023-04-11 Tue 23:03> Remote fixtures
   Listing down sub-problems. Then we should sort in the order to pick up.
 ** Creating fixture - use server git repo to have some pre-defined fixtures
@@ -158,6 +168,8 @@
    - set fields on transitions like updated_at
 ** TODO Refactor crud.py view implementation to modules
 *** TODO Revisit db queries, transaction isolation settings and db locks
+    - using django database options: [[https://docs.djangoproject.com/en/4.2/ref/databases/#isolation-level][django_isolation_levels]]
+    - explore setting isolation levels with [[https://github.com/Opus10/django-pgtransaction][pgtransactions]]
 *** TODO Modules list:
     1. Session
        - session is valid

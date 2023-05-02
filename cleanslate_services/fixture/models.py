@@ -20,6 +20,7 @@ class SessionStatus(models.IntegerChoices):
     STARTED = 3
     FINISHING = 4
     FINISHED = 5
+    ERROR = 6
 
 
 class FixtureInstanceStatus(models.IntegerChoices):
