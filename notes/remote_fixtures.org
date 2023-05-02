@@ -157,6 +157,7 @@
    - apply validation at database layer
    - set fields on transitions like updated_at
 ** TODO Refactor crud.py view implementation to modules
+*** TODO Revisit db queries, transaction isolation settings and db locks
 *** TODO Modules list:
     1. Session
        - session is valid
@@ -167,3 +168,6 @@
        - end session
     2. Fxiture Definition
     3. Fixture Instance
+** TODO refactor into service and setup django rest framework
+   - refactor views to rest apis
+*** TODO Create admin views for browsing and inspecting fixtures / resources

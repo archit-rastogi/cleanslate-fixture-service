@@ -234,7 +234,6 @@ def session_delete_fixture_instance(request: HttpRequest, session_id: str):
         req_json = json.loads(request.body)
         fixture_request = DeleteFixtureInstanceRequest(**req_json)
         with transaction.atomic():
-            # verify if session id is a valid session id
             session_obj = Session.objects.get(id=session_id)
             if session_obj is None or session_obj.status != SessionStatus.STARTED:
                 return JsonResponse(data={"error": "Invalid session or session status"}, status=404)
@@ -266,15 +265,51 @@ def session_delete_fixture_instance(request: HttpRequest, session_id: str):
 @require_http_methods(["GET"])
 def session_list_fixture_instances(request: HttpRequest, session_id: str):
     """List fixture instances for given session id."""
+    message = "Unknown"
+    status_code = 500
+    try:
+        # verify whether the fixture instance exists
+        fixture_instances = FixtureInstance.objects.filter(session_id=session_id).all()
+        return JsonResponse(data={"data": model_to_dict(fixture_instances)})
+    except Error as exc:
+        status_code = 500
+        message = exc.args[0]
+    return JsonResponse(data={"error": message}, status=status_code)
 
 
 @login_required
 @require_http_methods(["GET"])
-def session_get_fixture_instance(request: HttpRequest, session_id: str):
-    """session_get_fixture_instance for given session id."""
+def fixture_get_instance(request: HttpRequest, instance_id: str):
+    """Get fixture instance details in the given session id."""
+    message = "Unknown"
+    status_code = 500
+    try:
+        # verify whether the fixture instance exists
+        fixture_instance = FixtureInstance.objects.get(id=instance_id)
+        return JsonResponse(data={"data": model_to_dict(fixture_instance)})
+    except fixture.models.FixtureInstance.DoesNotExist as exc:
+        status_code = 404
+        message = exc.args[0]
+    except Error as exc:
+        status_code = 500
+        message = exc.args[0]
+    return JsonResponse(data={"error": message}, status=status_code)
 
 
 @login_required
 @require_http_methods(["GET", "POST", "DELETE"])
-def session_get_resource_by_fixture_instance(request: HttpRequest, session_id: str):
-    """session_get_resource_by_fixture_instance for given session id."""
+def fixture_get_resource_by_instance(request: HttpRequest, instance_id: str):
+    """Get resource for a given fixture instance id."""
+    message = "Unknown"
+    status_code = 500
+    try:
+        # verify whether the fixture instance exists
+        fixture_instance = FixtureInstance.objects.get(id=instance_id)
+        return JsonResponse(data={"data": model_to_dict(fixture_instance)})
+    except fixture.models.FixtureInstance.DoesNotExist as exc:
+        status_code = 404
+        message = exc.args[0]
+    except Error as exc:
+        status_code = 500
+        message = exc.args[0]
+    return JsonResponse(data={"error": message}, status=status_code)
