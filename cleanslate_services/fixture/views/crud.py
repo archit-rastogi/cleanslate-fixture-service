@@ -12,12 +12,14 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
+import fixture
 import fixture.modules.api as api_lib
 from fixture.models import (
     Session, SessionStatus, FixtureInstance, FixtureInstanceStatus, FixtureDefs, Resource, ResourceContent, ResourceType
 )
 from fixture.views.models import (
-    TestSessionRequest, CreateFixtureInstanceRequest, CreateResourceRequest, GetResourceRequest, DeleteResourceRequest
+    TestSessionRequest, CreateFixtureInstanceRequest, CreateResourceRequest, GetResourceRequest, DeleteResourceRequest,
+    DeleteFixtureInstanceRequest
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -118,7 +120,7 @@ def delete_resource(request: HttpRequest):
             if content_id is not None:
                 res_content_obj = ResourceContent.objects \
                     .filter(id=content_id) \
-                    .select_for_update(skip_locked=True) \
+                    .select_for_update() \
                     .first()
                 count = Resource.objects.filter(content=res_content_obj).count()
                 if count == 0:
@@ -146,7 +148,7 @@ def session_start(request: HttpRequest):
         name=session_req.name,
         description=session_req.description,
         status=SessionStatus.CREATED,
-        created_at=datetime.now(),
+        created_at=datetime.now(tz=timezone.utc),
         updated_at=None,
         exit_code=None,
         is_deleted=False,
@@ -191,12 +193,12 @@ def session_new_fixture_instance(request: HttpRequest, session_id: str):
     try:
         with transaction.atomic():
             # check session state
-            session_obj = Session.objects.filter(id=session_id).select_for_update(skip_locked=True).first()
+            session_obj = Session.objects.filter(id=session_id).select_for_update().first()
             if session_obj is None or session_obj.status >= SessionStatus.FINISHING:
                 return JsonResponse(data={"error": "Invalid session or session status"}, status=404)
             instance = FixtureInstance.objects \
                 .filter(session_id=session_id) \
-                .select_for_update(skip_locked=True) \
+                .select_for_update() \
                 .get(fixture_def_id=fdef.id)
             # case I: fixture instance already exists.
             if instance is not None:
@@ -225,7 +227,39 @@ def session_new_fixture_instance(request: HttpRequest, session_id: str):
 @login_required
 @require_http_methods(["POST"])
 def session_delete_fixture_instance(request: HttpRequest, session_id: str):
-    """session_delete_fixture_instance for given session id."""
+    """Delete the fixture instance for given session id."""
+    message = "Unknown"
+    status_code = 500
+    try:
+        req_json = json.loads(request.body)
+        fixture_request = DeleteFixtureInstanceRequest(**req_json)
+        with transaction.atomic():
+            # verify if session id is a valid session id
+            session_obj = Session.objects.get(id=session_id)
+            if session_obj is None or session_obj.status != SessionStatus.STARTED:
+                return JsonResponse(data={"error": "Invalid session or session status"}, status=404)
+
+            # verify whether the fixture instance exists
+            fixture_instance = FixtureInstance.objects \
+                .filter(session_id=session_id) \
+                .select_for_update() \
+                .get(id=fixture_request.identifier)
+
+            if fixture_instance.status not in (
+                    FixtureInstanceStatus.SETUP_FINISHED, FixtureInstanceStatus.SETUP_FAILED):
+                return JsonResponse(data={"error": "Invalid fixture status"}, status=404)
+            # Else the instance must be marked to be PENDING_TEARDOWN
+            fixture_instance.status = FixtureInstanceStatus.TEARDOWN_PENDING
+            fixture_instance.updated_at = datetime.now(tz=timezone.utc)
+            fixture_instance.save()
+            return JsonResponse(data=None)
+    except (fixture.models.FixtureInstance.DoesNotExist, fixture.models.Session.DoesNotExist) as exc:
+        status_code = 404
+        message = exc.args[0]
+    except Error as exc:
+        status_code = 500
+        message = exc.args[0]
+    return JsonResponse(data={"error": message}, status=status_code)
 
 
 @login_required
@@ -244,4 +278,3 @@ def session_get_fixture_instance(request: HttpRequest, session_id: str):
 @require_http_methods(["GET", "POST", "DELETE"])
 def session_get_resource_by_fixture_instance(request: HttpRequest, session_id: str):
     """session_get_resource_by_fixture_instance for given session id."""
-

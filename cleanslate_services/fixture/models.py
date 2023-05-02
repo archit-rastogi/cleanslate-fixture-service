@@ -27,12 +27,14 @@ class FixtureInstanceStatus(models.IntegerChoices):
     """Status for a test session."""
 
     CREATED = 1
-    SETUP_RUNNING = 2
-    SETUP_FINISHED = 3
-    SETUP_FAILED = 4
-    TEARDOWN_RUNNING = 5
-    TEARDOWN_FINISHED = 6
-    TEARDOWN_FAILED = 7
+    SETUP_PENDING = 2
+    SETUP_RUNNING = 3
+    SETUP_FINISHED = 4
+    SETUP_FAILED = 5
+    TEARDOWN_PENDING = 6
+    TEARDOWN_RUNNING = 7
+    TEARDOWN_FINISHED = 8
+    TEARDOWN_FAILED = 9
 
 
 class FixtureType(models.IntegerChoices):

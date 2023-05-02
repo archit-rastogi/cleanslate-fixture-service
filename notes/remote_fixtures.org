@@ -148,6 +148,22 @@
 ** DONE Add and implement a resource - native resource.
 ** TODO Support fixtures returning a resource.
 
-
-
-
+* Backlogs
+** TODO Library for response error messages and status code
+   - map django data base exception classes to status code and error messages.
+** TODO New class integer choices for statuses to have a dsl
+   - specify state transitions
+   - helper methods to assert state transitions
+   - apply validation at database layer
+   - set fields on transitions like updated_at
+** TODO Refactor crud.py view implementation to modules
+*** TODO Modules list:
+    1. Session
+       - session is valid
+         + exists
+         + belongs to the user or user has permissions to perform the action
+         + session is active
+       - start session
+       - end session
+    2. Fxiture Definition
+    3. Fixture Instance

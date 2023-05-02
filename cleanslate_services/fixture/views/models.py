@@ -16,6 +16,12 @@ class CreateFixtureInstanceRequest(BaseModel):
     namespace: str
     name: str
 
+class DeleteFixtureInstanceRequest(BaseModel):
+
+    """Request to delete an existing fixture instance."""
+
+    identifier: str
+
 
 class CreateResourceRequest(BaseModel):
 
